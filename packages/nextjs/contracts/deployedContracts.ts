@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     RitiProtocol: {
-      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      address: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
       abi: [
         {
           inputs: [
@@ -63,6 +63,234 @@ const deployedContracts = {
             },
           ],
           name: "createRiti",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_id",
+              type: "uint256",
+            },
+          ],
+          name: "getRiti",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "id",
+                  type: "uint256",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "string",
+                      name: "platformUsername",
+                      type: "string",
+                    },
+                    {
+                      internalType: "address",
+                      name: "userAddress",
+                      type: "address",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.UserInfo[]",
+                  name: "userInfo",
+                  type: "tuple[]",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "uint256",
+                      name: "lastUpdated",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "startTime",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "refreshCount",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "enum RitiProtocol.RefreshFrequency",
+                      name: "frequency",
+                      type: "uint8",
+                    },
+                    {
+                      components: [
+                        {
+                          internalType: "string",
+                          name: "platformName",
+                          type: "string",
+                        },
+                      ],
+                      internalType: "struct RitiProtocol.PlatformConfig",
+                      name: "platformConfig",
+                      type: "tuple",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.Config",
+                  name: "config",
+                  type: "tuple",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "enum RitiProtocol.Status",
+                      name: "status",
+                      type: "uint8",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.State",
+                  name: "state",
+                  type: "tuple",
+                },
+              ],
+              internalType: "struct RitiProtocol.Riti",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "userAddress",
+              type: "address",
+            },
+          ],
+          name: "getUserRitis",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "id",
+                  type: "uint256",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "string",
+                      name: "platformUsername",
+                      type: "string",
+                    },
+                    {
+                      internalType: "address",
+                      name: "userAddress",
+                      type: "address",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.UserInfo[]",
+                  name: "userInfo",
+                  type: "tuple[]",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "uint256",
+                      name: "lastUpdated",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "startTime",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "refreshCount",
+                      type: "uint256",
+                    },
+                    {
+                      internalType: "enum RitiProtocol.RefreshFrequency",
+                      name: "frequency",
+                      type: "uint8",
+                    },
+                    {
+                      components: [
+                        {
+                          internalType: "string",
+                          name: "platformName",
+                          type: "string",
+                        },
+                      ],
+                      internalType: "struct RitiProtocol.PlatformConfig",
+                      name: "platformConfig",
+                      type: "tuple",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.Config",
+                  name: "config",
+                  type: "tuple",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "enum RitiProtocol.Status",
+                      name: "status",
+                      type: "uint8",
+                    },
+                    {
+                      internalType: "uint256",
+                      name: "amount",
+                      type: "uint256",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.State",
+                  name: "state",
+                  type: "tuple",
+                },
+              ],
+              internalType: "struct RitiProtocol.Riti[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_id",
+              type: "uint256",
+            },
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "platformUsername",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "userAddress",
+                  type: "address",
+                },
+              ],
+              internalType: "struct RitiProtocol.UserInfo",
+              name: "_userInfo",
+              type: "tuple",
+            },
+          ],
+          name: "joinRiti",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",

@@ -21,7 +21,7 @@ contract RitiProtocol {
 
 	struct Riti {
 		uint256 id;
-		mapping(address => UserInfo) userInfo;
+		UserInfo[] userInfo;
 		Config config;
 		State state;
 	}
@@ -45,6 +45,7 @@ contract RitiProtocol {
 
 	struct UserInfo {
 		string platformUsername;
+		address userAddress;
 	}
 
 	struct Config {
@@ -77,6 +78,32 @@ contract RitiProtocol {
 		riti.state.status = Status.AcceptingUsers;
 		riti.config = _config;
 	}
+
+	function joinRiti(
+		uint256 _id,
+		UserInfo memory _userInfo
+		) public {
+
+		Riti storage riti = ritis[_id];
+		require(riti.state.status == Status.AcceptingUsers, "Riti is not accepting users");
+		riti.userInfo.push(_userInfo);
+		userRitis[_userInfo.userAddress].push(_id);
+	}
+
+	function getRiti(uint256 _id) public view returns (Riti memory) {
+		return ritis[_id];
+	}
+
+	function getUserRitis(address userAddress) public view returns (Riti[] memory) {
+		uint256[] memory ritiIds = userRitis[userAddress];
+		Riti[] memory ritiArray = new Riti[](ritiIds.length);
+		for (uint256 i = 0; i < ritiIds.length; i++) {
+			ritiArray[i] = getRiti(ritiIds[i]);
+		}
+		return ritiArray;
+	}
+
+
 	
 
 	// write create riti function
