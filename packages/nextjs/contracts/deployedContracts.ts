@@ -6,8 +6,8 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
-    YourContract: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    RitiProtocol: {
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       abi: [
         {
           inputs: [
@@ -19,50 +19,6 @@ const deployedContracts = {
           ],
           stateMutability: "nonpayable",
           type: "constructor",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "greetingSetter",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "newGreeting",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "bool",
-              name: "premium",
-              type: "bool",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "GreetingChange",
-          type: "event",
-        },
-        {
-          inputs: [],
-          name: "greeting",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
         },
         {
           inputs: [],
@@ -78,39 +34,75 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "premium",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
-            {
-              internalType: "string",
-              name: "_newGreeting",
-              type: "string",
-            },
-          ],
-          name: "setGreeting",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalCounter",
-          outputs: [
             {
               internalType: "uint256",
               name: "",
               type: "uint256",
+            },
+          ],
+          name: "ritis",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "id",
+              type: "uint256",
+            },
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "lastUpdated",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "startTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "refreshCount",
+                  type: "uint256",
+                },
+                {
+                  internalType: "enum RitiProtocol.RefreshFrequency",
+                  name: "frequency",
+                  type: "uint8",
+                },
+                {
+                  components: [
+                    {
+                      internalType: "string",
+                      name: "platformName",
+                      type: "string",
+                    },
+                  ],
+                  internalType: "struct RitiProtocol.PlatformConfig",
+                  name: "platformConfig",
+                  type: "tuple",
+                },
+              ],
+              internalType: "struct RitiProtocol.Config",
+              name: "config",
+              type: "tuple",
+            },
+            {
+              components: [
+                {
+                  internalType: "enum RitiProtocol.Status",
+                  name: "status",
+                  type: "uint8",
+                },
+                {
+                  internalType: "uint256",
+                  name: "amount",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct RitiProtocol.State",
+              name: "state",
+              type: "tuple",
             },
           ],
           stateMutability: "view",
@@ -123,8 +115,13 @@ const deployedContracts = {
               name: "",
               type: "address",
             },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
           ],
-          name: "userGreetingCounter",
+          name: "userRitis",
           outputs: [
             {
               internalType: "uint256",
@@ -134,17 +131,6 @@ const deployedContracts = {
           ],
           stateMutability: "view",
           type: "function",
-        },
-        {
-          inputs: [],
-          name: "withdraw",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          stateMutability: "payable",
-          type: "receive",
         },
       ],
       inheritedFunctions: {},
