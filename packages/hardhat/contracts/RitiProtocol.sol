@@ -40,7 +40,7 @@ contract RitiProtocol {
 	}
 
 	struct PlatformConfig {
-      string platformName;
+		string platformName;
 	}
 
 	struct UserInfo {
@@ -51,7 +51,7 @@ contract RitiProtocol {
 	struct Config {
 		uint256 lastUpdated;
 		uint256 startTime;
-	    uint256 refreshCount;
+		uint256 refreshCount;
 		RefreshFrequency frequency;
 		PlatformConfig platformConfig;
 	}
@@ -70,31 +70,29 @@ contract RitiProtocol {
 		_;
 	}
 
-	function createRiti(
-		Config memory _config
-		) public {
-
+	function createRiti(Config memory _config) public {
 		Riti storage riti = ritis[idCounter++];
 		riti.state.status = Status.AcceptingUsers;
 		riti.config = _config;
 	}
 
-	function joinRiti(
-		uint256 _id,
-		UserInfo memory _userInfo
-		) public {
-
-		Riti storage riti = ritis[_id];
-		require(riti.state.status == Status.AcceptingUsers, "Riti is not accepting users");
+	function joinRiti(uint256 _ritiId, UserInfo memory _userInfo) public {
+		Riti storage riti = ritis[_ritiId];
+		require(
+			riti.state.status == Status.AcceptingUsers,
+			"Riti is not accepting users"
+		);
 		riti.userInfo.push(_userInfo);
-		userRitis[_userInfo.userAddress].push(_id);
+		userRitis[_userInfo.userAddress].push(_ritiId);
 	}
 
 	function getRiti(uint256 _id) public view returns (Riti memory) {
 		return ritis[_id];
 	}
 
-	function getUserRitis(address userAddress) public view returns (Riti[] memory) {
+	function getUserRitis(
+		address userAddress
+	) public view returns (Riti[] memory) {
 		uint256[] memory ritiIds = userRitis[userAddress];
 		Riti[] memory ritiArray = new Riti[](ritiIds.length);
 		for (uint256 i = 0; i < ritiIds.length; i++) {
@@ -103,17 +101,7 @@ contract RitiProtocol {
 		return ritiArray;
 	}
 
-
-	
-
-	// write create riti function
-
-
-
 	// 1. Create Riti
 	// 2. Join Riti
 	// 3. Refresh Riti
-
 }
-
-
