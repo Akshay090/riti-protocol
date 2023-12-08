@@ -17,6 +17,22 @@ contract RitiProtocol {
 	// Make a mapping between, users and ritiIds
 	mapping(address => uint256[]) public userRitis;
 
+
+	struct UpdateRitiRequest {
+		uint256 ritiId;
+		RitiCompletionData data;
+	}
+
+	struct RitiCompletionData {
+		uint256 dataCollectionTimestamp;
+		UserRitiInformation[] completionStatus;
+	}
+
+	struct UserRitiInformation {
+		address userAddress;
+		bool isComplete;
+	}
+
 	uint256 private idCounter;
 
 	struct Riti {
@@ -51,14 +67,16 @@ contract RitiProtocol {
 	struct Config {
 		uint256 lastUpdated;
 		uint256 startTime;
-		uint256 refreshCount;
+		uint256 maxRefreshCount;
+		uint256 stakeAmount;
 		RefreshFrequency frequency;
 		PlatformConfig platformConfig;
 	}
 
 	struct State {
 		Status status;
-		uint256 amount;
+		uint256 refreshCount;
+		RitiCompletionData[] ritiCompletions;
 	}
 
 	constructor(address _owner) {
@@ -74,9 +92,16 @@ contract RitiProtocol {
 		Riti storage riti = ritis[idCounter++];
 		riti.state.status = Status.AcceptingUsers;
 		riti.config = _config;
+		riti.config.lastUpdated = riti.config.startTime;
+		riti.state.refreshCount = 0;
 	}
 
-	function joinRiti(uint256 _ritiId, UserInfo memory _userInfo) public {
+	function joinRiti(uint256 _ritiId, UserInfo memory _userInfo) public payable {
+		if(msg.value != ritis[_ritiId].config.stakeAmount) {
+			// comment for testing.
+			revert("Incorrect amount");
+		}
+		
 		Riti storage riti = ritis[_ritiId];
 		require(
 			riti.state.status == Status.AcceptingUsers,
@@ -101,7 +126,85 @@ contract RitiProtocol {
 		return ritiArray;
 	}
 
-	// 1. Create Riti
-	// 2. Join Riti
-	// 3. Refresh Riti
+	function refreshRiti(UpdateRitiRequest calldata request) public {
+
+		Riti storage riti = ritis[request.ritiId];
+
+		if(riti.state.status == Status.Ended) {
+			revert("Riti has ended already"); 
+		}
+
+		// we run riti if current time is startTime 
+		// if(block.timestamp >= ritis[_ritiId].config.startTime) {
+		// 	ritis[_ritiId].state.status = Status.Running;
+		// }
+
+		// dummy condition, to start riti remove later.
+		if(block.timestamp >= 0) {
+			riti.state.status = Status.Running;
+		}
+
+		
+		// Validate data is in correct range. 
+		// if(riti.config.frequency == riti.config.frequency && request.dataCollectionTimestamp >= now - 1 days) {
+		// 	riti.state.status = Status.Running;
+		// } else if(timePeriod == TimePeriod.Week && request.dataCollectionTimestamp >= now - 1 weeks) {
+		// 	riti.state.status = Status.Running;
+		// }  else {
+		// 	revert("Data collection timestamp is not within the correct range");
+		// }
+
+		// Validate: Data provider is for all users in this riti. There is not user who is not part of this riti.
+		
+		// match length of given data and riti user data
+
+		if(request.data.completionStatus.length != riti.userInfo.length) {
+			revert("Data provider is not for all users in this riti");
+		}
+
+		for(uint256 i = 0; i < request.data.completionStatus.length; i++) {
+			bool isUserPartOfRiti = false;
+			for(uint256 j = 0; j < riti.userInfo.length; j++) {
+				if(request.data.completionStatus[i].userAddress == riti.userInfo[j].userAddress) {
+					isUserPartOfRiti = true;
+					break;
+				}
+			}
+			if(!isUserPartOfRiti) {
+				revert("User is not part of this riti");
+			}
+		}
+
+		riti.state.ritiCompletions.push(request.data);
+		
+		riti.config.lastUpdated = riti.config.lastUpdated + 1 days; // dummy logic, to update.
+		riti.state.refreshCount++;
+
+		if(riti.state.refreshCount == riti.config.maxRefreshCount) {
+			riti.state.status = Status.Ended;
+		}
+	}
+
+	function getRanksForRiti(uint256 _ritiId) public view returns (uint256[] memory) {
+		Riti storage riti = ritis[_ritiId];
+		uint256[] memory ranks = new uint256[](riti.userInfo.length);
+		for(uint256 i = 0; i < riti.userInfo.length; i++) {
+			ranks[i] = getRankForUserInRiti(_ritiId, riti.userInfo[i].userAddress);
+		}
+		return ranks;
+	}
+
+	function getRankForUserInRiti(uint256 _ritiId, address _userAddress) public view returns (uint256) {
+		Riti storage riti = ritis[_ritiId];
+		uint256 rank = 0;
+		for(uint256 i = 0; i < riti.state.ritiCompletions.length; i++) {
+			for(uint256 j = 0; j < riti.state.ritiCompletions[i].completionStatus.length; j++) {
+				if(riti.state.ritiCompletions[i].completionStatus[j].userAddress == _userAddress) {
+					rank++;
+					break;
+				}
+			}
+		}
+		return rank;
+	}
 }
