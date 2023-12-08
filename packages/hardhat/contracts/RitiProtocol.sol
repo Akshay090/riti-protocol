@@ -72,17 +72,10 @@ contract RitiProtocol {
 	function createRiti(
 		Config memory _config
 		) public {
-		// Increment the global counter
-		idCounter++;
 
-		Riti memory newRiti = Riti({
-			id: idCounter,
-			config: _config,
-		});
-
-		newRiti.state.status = Status.AcceptingUsers;
-
-		ritis[idCounter] = newRiti;
+		Riti storage riti = ritis[idCounter++];
+		riti.state.status = Status.AcceptingUsers;
+		riti.config = _config;
 	}
 	
 
