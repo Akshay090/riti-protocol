@@ -1,0 +1,5 @@
+npx hardhat functions-simulate-script
+
+npx hardhat functions-deploy-consumer --network polygonMumbai --verify true
+npx hardhat functions-sub-create --network polygonMumbai --amount 0 --contract 0xD02934707fa571d3A97840E1AFCB5c98cA8B8645
+npx hardhat functions-request --network polygonMumbai --contract 0xe2fF76F6b7EF816cDa9fe758Cfa00B44D52a643D --subid 1153

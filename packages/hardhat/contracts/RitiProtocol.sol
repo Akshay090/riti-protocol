@@ -254,4 +254,16 @@ contract RitiProtocol {
 		
 		return rank;
 	}
+
+	// function to get Users Addresses by Ritis
+	function getUserAddressesByRitis(uint256 _ritiId) public view returns (address[] memory) {
+		Riti storage riti = ritis[_ritiId];
+		address[] memory userAddresses = new address[](riti.userInfo.length);
+		for(uint256 i = 0; i < riti.userInfo.length; i++) {
+			userAddresses[i] = riti.userInfo[i].userAddress;
+		}
+		return userAddresses;
+	}
+
+	
 }
