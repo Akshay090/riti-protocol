@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { RitiProtocol } from "../typechain-types";
+import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
 
 
 var m_w = 123456789;
@@ -28,13 +29,32 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
     const { deployer } = await hre.getNamedAccounts();
   
     const yourContract: RitiProtocol = await hre.ethers.getContract("RitiProtocol", deployer);
-   
+
+    const deployerSigner = await hre.ethers.getSigner(deployer);
+
+    const deployerPushApi = await PushAPI.initialize(
+      deployerSigner, 
+      { 
+          env: CONSTANTS.ENV.STAGING 
+     });
+
+    //  await deployerPushApi.channel.create({
+    //   name: "RitiProtocol Channel | Eth india",
+    //   description: "Eth India, team EtherYogis.",
+    //   icon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAz0lEQVR4AcXBsU0EQQyG0e+saWJ7oACiKYDMEZVs6GgSpC2BIhzRwAS0sgk9HKn3gpFOAv3v3V4/3+4U4Z1q5KTy42Ql940qvFONnFSGmCFmiN2+fj7uCBlihpgh1ngwcvKfwjuVIWaIGWKNB+GdauSk8uNkJfeNKryzYogZYoZY40m5b/wlQ8wQM8TayMlKeKcaOVkJ71QjJyuGmCFmiDUe+HFy4VyEd57hx0mV+0ZliBlihlgL71w4FyMnVXhnZeSkiu93qheuDDFDzBD7BcCyMAOfy204AAAAAElFTkSuQmCC",
+    //   url: "https://push.org",
+    //  });
+
+     const addedDelegate = await deployerPushApi.channel.delegate.add(
+      `eip155:11155111:${yourContract.address}`,
+     );
+
     await yourContract.createRiti(
         {
           "lastUpdated": 1,
           "startTime": 1,
-          "maxRefreshCount": 30,
-          "stakeAmount": 10000,
+          "maxRefreshCount": 2,
+          "stakeAmount": 1000000000,
           "frequency": 0,
           "platformConfig": {
             "platformName": "Leetcodes"
@@ -46,8 +66,8 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
       {
         "lastUpdated": 1,
         "startTime": 1,
-        "maxRefreshCount": 30,
-        "stakeAmount": 10000,
+        "maxRefreshCount": 2,
+        "stakeAmount": 1000000000,
         "frequency": 0,
         "platformConfig": {
           "platformName": "Cultfit"
@@ -59,50 +79,62 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         {
           "lastUpdated": 1,
           "startTime": 1,
-          "maxRefreshCount": 30,
-          "stakeAmount": 10000,
+          "maxRefreshCount": 2,
+          "stakeAmount": 1000000000,
           "frequency": 0,
           "platformConfig": {
             "platformName": "Cycling",
           }
         }
     );
-    
+
+    // sleep for 20s
+     await new Promise(r => setTimeout(r, 20000));    
+
     const accounts = await hre.getNamedAccounts();
+    console.log(accounts);
     const objectKeys = Object.keys(accounts);
   
   
-      for (let i = 1; i < objectKeys.length; i++) {
+      for (let i = 0; i < objectKeys.length; i++) {
   
         const account = accounts[objectKeys[i]];
-  
-  
-        const yourContract: RitiProtocol = await hre.ethers.getContract("RitiProtocol", account);
+        const accountPushApi = await PushAPI.initialize(
+          deployerSigner, 
+          { 
+              env: CONSTANTS.ENV.STAGING 
+        });
+
+
+        const response = await accountPushApi.notification.subscribe(
+          `eip155:11155111:0xdb184BC69B61b279c541189b5D698b31618dF1De`,
+        );
+
+        console.log(response);
         
-  
+        const yourContract: RitiProtocol = await hre.ethers.getContract("RitiProtocol", account);
+
         for(let j=0;j<3;j++){
-  
-          // get random true or false, return if false
-          // get random seed
-          const random = Math.random() >= 0.3;
-          if(!random){
-            continue;
-          }
-  
+          // 4
           // call join reeti with j, and pass user info as address and username as account object key
           // pay value that is in config of contract
           console.log("Joining Riti", j, "for user", account);
+
+          const ritiCur = await yourContract.getRiti(j);
+          // console.log(ritiCur);
           await yourContract.joinRiti(j, {
             userAddress: account,
             platformUsername: objectKeys[i],
           }, 
             {
-              value: (await yourContract.getRiti(j)).config.stakeAmount,
+              value: ritiCur.config.stakeAmount,
               from: account,
             }
           );
         }
       }
+
+      await new Promise(r => setTimeout(r, 20000));
   
       // call refresh on riti for maxRefreshCount times, do it for all ritis, have timeout of 3s between each refresh.
       // call all of them togeather, not sepeartely
@@ -115,11 +147,13 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         const yourContract: RitiProtocol = await hre.ethers.getContract("RitiProtocol", deployer);
         const riti = await yourContract.getRiti(i);
         const ritiUsers = riti.userInfo;
+
+        console.log(riti.userInfo);
       
         let userRandomValuesMap = new Map();
         // Assign a random value between 0 and 1 for each user in the riti
         for(let user of ritiUsers) {
-        await new Promise(r => setTimeout(r, 500));
+          await new Promise(r => setTimeout(r, 500));
           userRandomValuesMap.set(user.userAddress, Math.random() + 0.1)
         }
       
@@ -148,7 +182,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
             for(let j =0; j<ritiUsers.length; j++) {
               const user = ritiUsers[j];
                 const randomValue = Math.random();
-                const randomm =randomValue <= (randomValuesMap.get(i)?.get(user.userAddress)!!);
+                const randomm = randomValue <= (randomValuesMap.get(i)?.get(user.userAddress)!!);
                 // console.log(user.platformUsername);
                 console.log(user.platformUsername + (randomm ? " completed" : " not completed") + " task on " + riti.config.platformConfig.platformName + " at time "  + time
                 );

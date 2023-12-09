@@ -109,29 +109,7 @@ contract RitiProtocol {
 		_;
 	}
 
-	function createRiti(Config memory _config) public {
-		// IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
-		//     0xdb184BC69B61b279c541189b5D698b31618dF1De,
-		//     address(this),
-		//     bytes(
-		//         string(
-		//             abi.encodePacked(
-		//                 "0",
-		//                 "+", // segregator
-		//                 "1",
-		//                 "+", // segregator
-		//                 "Tranfer Alert", // this is notification title
-		//                 "+", // segregator
-		//                 "Hooray! ", // notification body
-		//                 "hello", // notification body
-		//                 " sent ", // notification body
-		//                 "manthan", // notification body
-		//                 " PUSH to you!" // notification body
-		//             )
-		//         )
-		//     )
-		// );
-
+	function createRiti(Config memory _config) public {		
 		Riti storage riti = ritis[idCounter++];
 		riti.id = idCounter - 1;
 		riti.state.status = Status.AcceptingUsers;
@@ -156,6 +134,24 @@ contract RitiProtocol {
 		);
 		riti.userInfo.push(_userInfo);
 		userRitis[_userInfo.userAddress].push(_ritiId);
+
+		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+			0xdb184BC69B61b279c541189b5D698b31618dF1De,
+            _userInfo.userAddress, 
+            bytes(
+                string(
+                    abi.encodePacked(
+                        "0", 
+                        "+", // segregator
+                        "3",
+                        "+", // segregator
+                        string(abi.encodePacked("Joined Riti ", riti.config.platformConfig.platformName)), // this is notification title
+                        "+", // segregator
+                        "Follow this Riti, We know you will rock it!" // notification body
+                    )
+                )
+            )
+        );
 	}
 
 	function getRiti(uint256 _id) public view returns (Riti memory) {
@@ -236,7 +232,34 @@ contract RitiProtocol {
 		riti.config.lastUpdated = riti.config.lastUpdated + 1 days; // dummy logic, to update.
 		riti.state.refreshCount++;
 
-		if (riti.state.refreshCount == riti.config.maxRefreshCount) {
+		for(uint256 i = 0; i < request.data.completionStatus.length; i++) {
+			
+			string memory message = "Congrats on completing the riti yesterday, keep up the good work!";
+			if(!request.data.completionStatus[i].isComplete) {
+				message = "You missed the riti yesterday, no worries, try to complete it today!";
+				continue;
+			}
+
+			IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+				0xdb184BC69B61b279c541189b5D698b31618dF1De,
+				request.data.completionStatus[i].userAddress, 
+				bytes(
+					string(
+						abi.encodePacked(
+							"0", 
+							"+", // segregator
+							"3",
+							"+", // segregator
+							string(abi.encodePacked("Riti ", riti.config.platformConfig.platformName, " Updated!!")), // this is notification title
+							"+", // segregator
+							message // notification body
+						)
+					)
+				)
+			);
+		}
+
+		if(riti.state.refreshCount == riti.config.maxRefreshCount) {
 			riti.state.status = Status.Ended;
 		} else {
 			return;
@@ -246,6 +269,48 @@ contract RitiProtocol {
 		UserEarning[] memory earnings = getEarningsForAllUsersInRiti(riti.id);
 		for (uint256 i = 0; i < earnings.length; i++) {
 			payable(earnings[i].userAddress).transfer(earnings[i].earning);
+		}
+
+		// send notification to all users
+		for(uint256 i = 0; i < riti.userInfo.length; i++) {
+			// calculate profit or loss in earning and for message.
+			// it can be calculated by comparing earning and stake amount.
+			uint256 profitOrLoss = earnings[i].earning - riti.config.stakeAmount;
+
+		 	string memory message = string(abi.encodePacked(
+					"You have had a loss this time :( of", 
+					profitOrLoss, 
+					" wei! Your final score was",
+					getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress),
+					" Hope this was a learning experience for you! See you soon again."
+				));
+			// add profit loss information in message.
+			if(profitOrLoss >= 0) {
+				 message = string(abi.encodePacked(
+					"Congratulations! You have earned extra", 
+					profitOrLoss, 
+					" wei! Your final score was",
+					getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress)
+					));
+			}
+
+			IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+				0xdb184BC69B61b279c541189b5D698b31618dF1De,
+				riti.userInfo[i].userAddress, 
+				bytes(
+					string(
+						abi.encodePacked(
+							"0", 
+							"+", // segregator
+							"3",
+							"+", // segregator
+							string(abi.encodePacked("Riti ", riti.config.platformConfig.platformName, " Completed!!")), // this is notification title
+							"+", // segregator
+							message
+						)
+					)
+				)
+			);
 		}
 	}
 

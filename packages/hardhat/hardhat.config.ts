@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "sepolia",
   namedAccounts: {
     deployer: {
       // By default, it will take the first Hardhat account as the deployer
@@ -43,12 +43,12 @@ const config: HardhatUserConfig = {
     akshay:{
       default: 3,
     },
-    anurag:{
-      default: 4,
-    },
-    shailendra:{
-      default: 5,
-    }
+    // anurag:{
+    //   default: 4,
+    // },
+    // shailendra:{
+    //   default: 5,
+    // }
   },
   networks: {
     // View the networks that are pre-configured.
@@ -65,7 +65,12 @@ const config: HardhatUserConfig = {
     },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`,
-      accounts: [deployerPrivateKey],
+      accounts: [
+        deployerPrivateKey, 
+        deployerPrivateKey, 
+        "8a3bf2a8ffa75073defac3ccd408f6e12b0001326ed4f308587c5002e34cb4c3",
+        "875483659910587fc5a37af57983044074e50a21546ad58ad9d4d838719bedb0"
+      ],
     },
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${providerApiKey}`,
