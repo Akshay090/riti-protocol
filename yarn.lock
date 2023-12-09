@@ -1910,6 +1910,7 @@ __metadata:
     "@trivago/prettier-plugin-sort-imports": ^4.1.1
     "@types/node": ^17.0.35
     "@types/react": ^18.0.9
+    "@types/react-calendar-heatmap": ^1
     "@types/react-copy-to-clipboard": ^5.0.4
     "@typescript-eslint/eslint-plugin": ^5.39.0
     "@uniswap/sdk-core": ^4.0.1
@@ -1927,6 +1928,7 @@ __metadata:
     prettier: ^2.8.4
     qrcode.react: ^3.1.0
     react: ^18.2.0
+    react-calendar-heatmap: ^1.9.0
     react-copy-to-clipboard: ^5.1.0
     react-dom: ^18.2.0
     react-hot-toast: ^2.4.0
@@ -2624,6 +2626,15 @@ __metadata:
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
   checksum: 7fd6f9c25053e9b5bb6bc9f9f76c1d89e6c04f7707a7ba0e44cc01f17ef5284adb82f230f542c2d5557d69407c9a40f0f3515e8319afd14e1e16b5543ac6cdba
+  languageName: node
+  linkType: hard
+
+"@types/react-calendar-heatmap@npm:^1":
+  version: 1.6.6
+  resolution: "@types/react-calendar-heatmap@npm:1.6.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: 75395dde5a8786fd92fa633b16b94c5eb640deebf47b6e0973c81681f22e194f21dcff770258fe0fbd0df583276ae9630675a11da9c1e2c98a4740d0aa06f5da
   languageName: node
   linkType: hard
 
@@ -9531,6 +9542,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"memoize-one@npm:^5.0.0":
+  version: 5.2.1
+  resolution: "memoize-one@npm:5.2.1"
+  checksum: a3cba7b824ebcf24cdfcd234aa7f86f3ad6394b8d9be4c96ff756dafb8b51c7f71320785fbc2304f1af48a0467cbbd2a409efc9333025700ed523f254cb52e3d
+  languageName: node
+  linkType: hard
+
 "memory-level@npm:^1.0.0":
   version: 1.0.0
   resolution: "memory-level@npm:1.0.0"
@@ -11117,7 +11135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -11306,6 +11324,18 @@ __metadata:
     iconv-lite: 0.4.24
     unpipe: 1.0.0
   checksum: 5362adff1575d691bb3f75998803a0ffed8c64eabeaa06e54b4ada25a0cd1b2ae7f4f5ec46565d1bec337e08b5ac90c76eaa0758de6f72a633f025d754dec29e
+  languageName: node
+  linkType: hard
+
+"react-calendar-heatmap@npm:^1.9.0":
+  version: 1.9.0
+  resolution: "react-calendar-heatmap@npm:1.9.0"
+  dependencies:
+    memoize-one: ^5.0.0
+    prop-types: ^15.6.2
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 00ee57373f9827c383f5060520ab57cce99960ca8c6e35fa7a9bd885ab98642560473d617e3696dc2f4116e5ca47a42bf9f9f6df69860b87249c1ce2d3f7a0b3
   languageName: node
   linkType: hard
 
