@@ -23,7 +23,7 @@ const ScoreCard = () => {
   );
 };
 
-const Home: NextPage = () => {
+const AddRitiButton = (): JSX.Element => {
   const inputRefs = {
     maxRefreshCount: React.useRef<HTMLInputElement>(null),
     frequency: React.useRef<HTMLInputElement>(null),
@@ -44,85 +44,90 @@ const Home: NextPage = () => {
         platformName: inputRefs.platformName.current?.value,
       },
     };
-    console.log(dataToSubmit);
+    console.log(dataToSubmit, "dataToSubmit");
   };
+  return (
+    <>
+      <button
+        className="btn"
+        onClick={(): void => {
+          const modal = document.getElementById("my_modal_1") as HTMLDialogElement;
+          if (!modal) return;
+          modal.showModal();
+        }}
+      >
+        Create Riti +
+      </button>
 
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Create Riti</h3>
+          <div className="py-4">
+            <p>Add Details to Create a Riti</p>
+            {/* ---- */}
+            <div className="w-full mt-5 sm:mt-8">
+              <div className="mx-auto w-full sm:max-w-md md:max-w-lg flex flex-col gap-5">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    placeholder="Enter Max Refresh Count"
+                    className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
+                    ref={inputRefs.maxRefreshCount}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enter Frequency"
+                    className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
+                    ref={inputRefs.frequency}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Enter Start Time"
+                  className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
+                  ref={inputRefs.startTime}
+                />
+                <input
+                  ref={inputRefs.platformName}
+                  type="text"
+                  placeholder="Enter Platform Name"
+                  className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
+                />
+                <input
+                  type="text"
+                  placeholder="Enter Stake Amount"
+                  className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
+                  ref={inputRefs.stakeAmout}
+                />
+              </div>
+
+              <button onClick={handleForm} className="btn btn-active btn-block max-w-[150px] mt-8">
+                Create Riti+
+              </button>
+            </div>
+
+            {/* ---- */}
+          </div>
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    </>
+  );
+};
+
+const Home: NextPage = () => {
   return (
     <>
       <MetaHeader />
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="flex-grow w-full px-8">
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <div>
-              <button
-                className="btn"
-                onClick={(): void => {
-                  const modal = document.getElementById("my_modal_1") as HTMLDialogElement;
-                  if (!modal) return;
-                  modal.showModal();
-                }}
-              >
-                Create Riti +
-              </button>
-            </div>
-
-            <dialog id="my_modal_1" className="modal">
-              <div className="modal-box">
-                <h3 className="font-bold text-lg">Create Riti</h3>
-                <div className="py-4">
-                  <p>Add Details to Create a Riti</p>
-                  {/* ---- */}
-                  <div className="w-full mt-5 sm:mt-8">
-                    <div className="mx-auto w-full sm:max-w-md md:max-w-lg flex flex-col gap-5">
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <input
-                          type="text"
-                          placeholder="Enter Max Refresh Count"
-                          className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
-                          ref={inputRefs.maxRefreshCount}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Enter Frequency"
-                          className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
-                          ref={inputRefs.frequency}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Enter Start Time"
-                        className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
-                        ref={inputRefs.startTime}
-                      />
-                      <input
-                        ref={inputRefs.platformName}
-                        type="text"
-                        placeholder="Enter Platform Name"
-                        className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Enter Stake Amount"
-                        className="input input-accent w-full max-w-xs text-neutral placeholder:text-neutral/40"
-                        ref={inputRefs.stakeAmout}
-                      />
-                    </div>
-
-                    <button onClick={handleForm} className="btn btn-active btn-block max-w-[150px] mt-8">
-                      Create Riti+
-                    </button>
-                  </div>
-
-                  {/* ---- */}
-                </div>
-                <div className="modal-action">
-                  <form method="dialog">
-                    {/* if there is a button in form, it will close the modal */}
-                    <button className="btn">Close</button>
-                  </form>
-                </div>
-              </div>
-            </dialog>
+            <AddRitiButton />
           </div>
         </div>
       </div>
