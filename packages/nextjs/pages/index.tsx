@@ -1,9 +1,37 @@
+import { useEffect } from "react";
+import * as React from "react";
 import Link from "next/link";
+import { CONSTANTS, PushAPI } from "@pushprotocol/restapi";
 import type { NextPage } from "next";
+import "wagmi";
 import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { useEthersSigner } from "~~/hooks/useeEthersSigner";
 
 const Home: NextPage = () => {
+  const signer = useEthersSigner();
+
+  console.log(signer);
+
+  useEffect(() => {
+    if (!signer) return;
+    async function connect() {
+      const user = await PushAPI.initialize(signer, { env: CONSTANTS.ENV.STAGING });
+
+      // channel creation
+      // const response = await user.channel.create({
+      //   name: "Riti Protocol Beta 1 Channel",
+      //   description: "Test Description",
+      //   icon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAz0lEQVR4AcXBsU0EQQyG0e+saWJ7oACiKYDMEZVs6GgSpC2BIhzRwAS0sgk9HKn3gpFOAv3v3V4/3+4U4Z1q5KTy42Ql940qvFONnFSGmCFmiN2+fj7uCBlihpgh1ngwcvKfwjuVIWaIGWKNB+GdauSk8uNkJfeNKryzYogZYoZY40m5b/wlQ8wQM8TayMlKeKcaOVkJ71QjJyuGmCFmiDUe+HFy4VyEd57hx0mV+0ZliBlihlgL71w4FyMnVXhnZeSkiu93qheuDDFDzBD7BcCyMAOfy204AAAAAElFTkSuQmCC",
+      //   url: "https://push.org",
+      // });
+
+      // send notif to channel
+      console.log("user", await user.channel.info());
+    }
+    connect();
+  }, [signer]);
+
   return (
     <>
       <MetaHeader />

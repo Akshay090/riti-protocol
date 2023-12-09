@@ -1,13 +1,22 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+
 // Useful for debugging. Remove when deploying to a live network.
 // import "hardhat/console.sol";
+
+// PUSH Comm Contract Interface
+interface IPUSHCommInterface {
+    function sendNotification(address _channel, address _recipient, bytes calldata _identity) external;
+}
 
 /**
  * @author thesmallstar && Akshay090
  */
 contract RitiProtocol {
+
+	address public EPNS_COMM_ADDRESS = 0x0C34d54a09CFe75BCcd878A469206Ae77E0fe6e7;
+
 	// State Variables
 	address public immutable owner;
 
@@ -99,6 +108,30 @@ contract RitiProtocol {
 	}
 
 	function createRiti(Config memory _config) public {
+
+		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+            0xdb184BC69B61b279c541189b5D698b31618dF1De, 
+            address(this),
+            bytes(
+                string(
+                    abi.encodePacked(
+                        "0", 
+                        "+", // segregator
+                        "1",
+                        "+", // segregator
+                        "Tranfer Alert", // this is notification title
+                        "+", // segregator
+                        "Hooray! ", // notification body
+                        "hello", // notification body
+                        " sent ", // notification body
+                        "manthan", // notification body
+                        " PUSH to you!" // notification body
+                    )
+                )
+            )
+        );
+
+		
 		Riti storage riti = ritis[idCounter++];
 		riti.state.status = Status.AcceptingUsers;
 		riti.config = _config;
