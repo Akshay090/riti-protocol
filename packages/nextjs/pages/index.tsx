@@ -9,7 +9,17 @@ import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline"
 import { MetaHeader } from "~~/components/MetaHeader";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
-const ScoreCard = ({ name, ritiId }: { name: string; ritiId: bigint }) => {
+const ScoreCard = ({
+  name,
+  ritiId,
+  progPercent,
+  currentStreak,
+}: {
+  name: string;
+  ritiId: bigint;
+  progPercent: bigint;
+  currentStreak: bingint;
+}) => {
   const { address } = useAccount();
 
   const scoreResp = useScaffoldContractRead({
@@ -40,9 +50,9 @@ const ScoreCard = ({ name, ritiId }: { name: string; ritiId: bigint }) => {
         <p className="ml-2 font-semibold">{name}</p>
       </div>
       <div className="flex items-center justify-between w-full font-bold text-lg">
-        <div className="font-bold">40%</div>
-        <div className="flex items-center justify-between ">
-          <p>🔥9</p>
+        <div className="font-bold">{Number(progPercent)}%</div>
+        <div className="flex items-center justify-between">
+          <p>🔥{Number(currentStreak)}</p>
           <p className="m-4">#{rankByAddress + 1}</p>
         </div>
       </div>
@@ -97,7 +107,14 @@ const Home: NextPage = () => {
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
             <h2 className="font-bold text-xl">Your Ritis</h2>
             {getUserRitisResp.data?.map(riti => {
-              return <ScoreCard name={riti.config.platformConfig.platformName} ritiId={riti.id} />;
+              return (
+                <ScoreCard
+                  name={riti.config.platformConfig.platformName}
+                  ritiId={riti.id}
+                  progPercent={(riti.state.refreshCount / riti.config.maxRefreshCount) * BigInt(100)}
+                  currentStreak={riti.state.refreshCount}
+                />
+              );
             })}
           </div>
         </div>
