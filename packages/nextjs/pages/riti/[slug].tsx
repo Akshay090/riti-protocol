@@ -1,64 +1,16 @@
 import { useEffect } from "react";
 import * as React from "react";
 import Image from "next/image";
-import PosterImage from "../components/assets/poster-image.png";
+import { useRouter } from "next/router";
+import PosterImage from "../../components/assets/poster-image.png";
 import type { NextPage } from "next";
+import CalendarHeatmap from "react-calendar-heatmap";
+import "react-calendar-heatmap/dist/styles.css";
 import "wagmi";
 import { useAccount } from "wagmi";
 import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
-
-const ScoreCard = ({
-  name,
-  ritiId,
-  progPercent,
-  currentStreak,
-}: {
-  name: string;
-  ritiId: bigint;
-  progPercent: bigint;
-  currentStreak: bigint;
-}) => {
-  const { address } = useAccount();
-
-  const scoreResp = useScaffoldContractRead({
-    contractName: "RitiProtocol",
-    functionName: "getScoresForRiti",
-    args: [ritiId],
-  });
-
-  const sortedbyScore = Array.from(scoreResp.data || []).sort((a, b) => {
-    return Number(b.score) - Number(a.score);
-  });
-
-  // position in array becomes rank, by addresss,  find by address
-  const rankByAddress = sortedbyScore.findIndex(score => {
-    return score.userAddress === address;
-  });
-  console.log("rankByAddress", rankByAddress, " sortedbyScore", sortedbyScore, name);
-
-  return (
-    <div
-      style={{
-        minWidth: "300px",
-      }}
-      className="flex flex-col bg-base-100 px-4 py-4 text-center items-start max-w-md rounded-2xl"
-    >
-      <div className="flex items-center justify-center">
-        <BugAntIcon className="h-8 w-8 fill-secondary" />
-        <p className="ml-2 font-semibold">{name}</p>
-      </div>
-      <div className="flex items-center justify-between w-full font-bold text-lg">
-        <div className="font-bold">{Number(progPercent)}%</div>
-        <div className="flex items-center justify-between">
-          <p>🔥{Number(currentStreak)}</p>
-          <p className="m-4">#{rankByAddress + 1}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Home: NextPage = () => {
   const { address } = useAccount();
@@ -104,19 +56,31 @@ const Home: NextPage = () => {
       <MetaHeader />
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="flex-grow w-full px-8">
-          <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
+        <div className="max-w-xl p-2">
+        <CalendarHeatmap
+            startDate={new Date("2016-01-01")}
+            endDate={new Date("2016-04-01")}
+            values={[
+              { date: "2016-01-01", count: 12 },
+              { date: "2016-01-22", count: 122 },
+              { date: "2016-01-30", count: 38 },
+              // ...and so on
+            ]}
+          />
+        </div>
+          {/* <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
             <h2 className="font-bold text-xl">Your Ritis</h2>
             {getUserRitisResp.data?.map(riti => {
               return (
-                <ScoreCard
-                  name={riti.config.platformConfig.platformName}
-                  ritiId={riti.id}
-                  progPercent={(riti.state.refreshCount / riti.config.maxRefreshCount) * BigInt(100)}
-                  currentStreak={riti.state.refreshCount}
-                />
+                // <ScoreCard
+                //   name={riti.config.platformConfig.platformName}
+                //   ritiId={riti.id}
+                //   progPercent={(riti.state.refreshCount / riti.config.maxRefreshCount) * BigInt(100)}
+                //   currentStreak={riti.state.refreshCount}
+                // />
               );
             })}
-          </div>
+          </div> */}
         </div>
 
         {/* <div className="px-5">
