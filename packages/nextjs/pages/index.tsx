@@ -4,21 +4,46 @@ import Image from "next/image";
 import PosterImage from "../components/assets/poster-image.png";
 import type { NextPage } from "next";
 import "wagmi";
+import { useAccount } from "wagmi";
 import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
-const ScoreCard = () => {
+const ScoreCard = ({ name, ritiId }: { name: string; ritiId: bigint }) => {
+  const { address } = useAccount();
+
+  const scoreResp = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getScoresForRiti",
+    args: [ritiId],
+  });
+
+  const sortedbyScore = Array.from(scoreResp.data || []).sort((a, b) => {
+    return Number(b.score) - Number(a.score);
+  });
+
+  // position in array becomes rank, by addresss,  find by address
+  const rankByAddress = sortedbyScore.findIndex(score => {
+    return score.userAddress === address;
+  });
+  console.log("rankByAddress", rankByAddress, " sortedbyScore", sortedbyScore, name);
+
   return (
-    <div className="flex flex-col bg-base-100 px-4 py-4 text-center items-start max-w-md rounded-2xl">
+    <div
+      style={{
+        minWidth: "300px",
+      }}
+      className="flex flex-col bg-base-100 px-4 py-4 text-center items-start max-w-md rounded-2xl"
+    >
       <div className="flex items-center justify-center">
         <BugAntIcon className="h-8 w-8 fill-secondary" />
-        <p className="ml-2 font-semibold">LeetCode December Challenge</p>
+        <p className="ml-2 font-semibold">{name}</p>
       </div>
       <div className="flex items-center justify-between w-full font-bold text-lg">
         <div className="font-bold">40%</div>
         <div className="flex items-center justify-between ">
           <p>🔥9</p>
-          <p className="m-4">#13</p>
+          <p className="m-4">#{rankByAddress + 1}</p>
         </div>
       </div>
     </div>
@@ -26,6 +51,21 @@ const ScoreCard = () => {
 };
 
 const Home: NextPage = () => {
+  const { address } = useAccount();
+
+  const getUserRitisResp = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getUserRitis",
+    args: [address],
+  });
+
+  console.log("getUserRitisResp", getUserRitisResp.data);
+
+  const getAllRitisResp = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getAllRitis",
+  });
+
   // const signer = useEthersSigner();
 
   // console.log(signer);
@@ -55,9 +95,10 @@ const Home: NextPage = () => {
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="flex-grow w-full px-8">
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <ScoreCard />
-            <ScoreCard />
-            <ScoreCard />
+            <h2 className="font-bold text-xl">Your Ritis</h2>
+            {getUserRitisResp.data?.map(riti => {
+              return <ScoreCard name={riti.config.platformConfig.platformName} ritiId={riti.id} />;
+            })}
           </div>
         </div>
 
@@ -91,8 +132,30 @@ const Home: NextPage = () => {
               <div className="">
                 <Image width={400} height={270} src={PosterImage} alt="join poster" />
               </div>
-              <div className="ml-2">
+              <div
+                className="ml-2"
+                style={{
+                  maxHeight: "380px",
+                  overflowY: "scroll",
+                }}
+              >
                 <div className="hover:bg-secondary hover:rounded-lg text-start py-2 px-3">
+                  <p className="font-semibold">Frontend Challenge</p>
+                  <p className="font-normal	text-neutral">Re-usable components built using Radix UI and Tailwind CSS</p>
+                </div>
+
+                {getAllRitisResp.data?.map(riti => {
+                  return (
+                    <div className="hover:bg-secondary hover:rounded-lg text-start py-2 px-3">
+                      <p className="font-semibold">{riti.config.platformConfig.platformName}</p>
+                      <p className="font-normal	text-neutral">
+                        Re-usable components built using Radix UI and Tailwind CSS
+                      </p>
+                    </div>
+                  );
+                })}
+
+                {/* <div className="hover:bg-secondary hover:rounded-lg text-start py-2 px-3">
                   <p className="font-semibold">Frontend Challenge</p>
                   <p className="font-normal	text-neutral">Re-usable components built using Radix UI and Tailwind CSS</p>
                 </div>
@@ -100,12 +163,7 @@ const Home: NextPage = () => {
                 <div className="hover:bg-secondary hover:rounded-lg text-start py-2 px-3">
                   <p className="font-semibold">Frontend Challenge</p>
                   <p className="font-normal	text-neutral">Re-usable components built using Radix UI and Tailwind CSS</p>
-                </div>
-
-                <div className="hover:bg-secondary hover:rounded-lg text-start py-2 px-3">
-                  <p className="font-semibold">Frontend Challenge</p>
-                  <p className="font-normal	text-neutral">Re-usable components built using Radix UI and Tailwind CSS</p>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="flex flex-col bg-base-100 p-4 text-center items-start max-w-xl rounded-md">
