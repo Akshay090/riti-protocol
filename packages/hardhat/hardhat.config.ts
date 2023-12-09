@@ -26,18 +26,35 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  defaultNetwork: "sepolia",
+  defaultNetwork: "localhost",
   namedAccounts: {
     deployer: {
       // By default, it will take the first Hardhat account as the deployer
       default: 0,
     },
+    manthan: {
+      // By default, it will take the first Hardhat account as the deployer
+      default: 1,
+    },
+    riya: {
+      // By default, it will take the first Hardhat account as the deployer
+      default: 2,
+    },
+    akshay:{
+      default: 3,
+    },
+    anurag:{
+      default: 4,
+    },
+    shailendra:{
+      default: 5,
+    }
   },
   networks: {
     // View the networks that are pre-configured.
     // If the network you are looking for is not here you can add new network settings
     hardhat: {
-      forking: {
+      'forking': {
         url: `https://eth-mainnet.alchemyapi.io/v2/${providerApiKey}`,
         enabled: process.env.MAINNET_FORKING_ENABLED === "true",
       },
@@ -136,6 +153,7 @@ const config: HardhatUserConfig = {
       apiKey: `${etherscanApiKey}`,
     },
   },
+  
 };
 
 export default config;

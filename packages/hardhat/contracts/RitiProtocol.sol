@@ -109,27 +109,27 @@ contract RitiProtocol {
 
 	function createRiti(Config memory _config) public {
 
-		IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
-            0xdb184BC69B61b279c541189b5D698b31618dF1De, 
-            address(this),
-            bytes(
-                string(
-                    abi.encodePacked(
-                        "0", 
-                        "+", // segregator
-                        "1",
-                        "+", // segregator
-                        "Tranfer Alert", // this is notification title
-                        "+", // segregator
-                        "Hooray! ", // notification body
-                        "hello", // notification body
-                        " sent ", // notification body
-                        "manthan", // notification body
-                        " PUSH to you!" // notification body
-                    )
-                )
-            )
-        );
+		// IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
+        //     0xdb184BC69B61b279c541189b5D698b31618dF1De, 
+        //     address(this),
+        //     bytes(
+        //         string(
+        //             abi.encodePacked(
+        //                 "0", 
+        //                 "+", // segregator
+        //                 "1",
+        //                 "+", // segregator
+        //                 "Tranfer Alert", // this is notification title
+        //                 "+", // segregator
+        //                 "Hooray! ", // notification body
+        //                 "hello", // notification body
+        //                 " sent ", // notification body
+        //                 "manthan", // notification body
+        //                 " PUSH to you!" // notification body
+        //             )
+        //         )
+        //     )
+        // );
 
 		
 		Riti storage riti = ritis[idCounter++];
