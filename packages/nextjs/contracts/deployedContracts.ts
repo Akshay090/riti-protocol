@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     RitiProtocol: {
-      address: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       abi: [
         {
           inputs: [
@@ -79,37 +79,25 @@ const deployedContracts = {
               name: "_ritiId",
               type: "uint256",
             },
-            {
-              internalType: "address",
-              name: "_userAddress",
-              type: "address",
-            },
           ],
-          name: "getRankForUserInRiti",
+          name: "getEarningsForAllUsersInRiti",
           outputs: [
             {
-              internalType: "uint256",
+              components: [
+                {
+                  internalType: "address",
+                  name: "userAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "earning",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct RitiProtocol.UserEarning[]",
               name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_ritiId",
-              type: "uint256",
-            },
-          ],
-          name: "getRanksForRiti",
-          outputs: [
-            {
-              internalType: "uint256[]",
-              name: "",
-              type: "uint256[]",
+              type: "tuple[]",
             },
           ],
           stateMutability: "view",
@@ -251,6 +239,61 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "uint256",
+              name: "_ritiId",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_userAddress",
+              type: "address",
+            },
+          ],
+          name: "getScoreForUserInRiti",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_ritiId",
+              type: "uint256",
+            },
+          ],
+          name: "getScoresForRiti",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "userAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "score",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct RitiProtocol.UserScore[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "address",
               name: "userAddress",
               type: "address",
@@ -376,6 +419,35 @@ const deployedContracts = {
               internalType: "struct RitiProtocol.Riti[]",
               name: "",
               type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_ritiId",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "totalScore",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "userAddress",
+              type: "address",
+            },
+          ],
+          name: "getUsersEarningForRiti",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
             },
           ],
           stateMutability: "view",

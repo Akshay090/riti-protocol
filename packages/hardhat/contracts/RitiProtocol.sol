@@ -42,6 +42,16 @@ contract RitiProtocol {
 		State state;
 	}
 
+	struct UserScore {
+		address userAddress;
+		uint256 score;
+	}
+
+	struct UserEarning {
+		address userAddress;
+		uint256 earning;
+	}
+
 	enum RefreshFrequency {
 		Day,
 		Week,
@@ -182,29 +192,66 @@ contract RitiProtocol {
 
 		if(riti.state.refreshCount == riti.config.maxRefreshCount) {
 			riti.state.status = Status.Ended;
+		} else {
+			return; 
+		}
+
+		// transfer earnings
+		UserEarning[] memory earnings = getEarningsForAllUsersInRiti(riti.id);
+		for(uint256 i = 0; i < earnings.length; i++) {
+			payable(earnings[i].userAddress).transfer(earnings[i].earning);
 		}
 	}
 
-	function getRanksForRiti(uint256 _ritiId) public view returns (uint256[] memory) {
+	function getEarningsForAllUsersInRiti(uint256 _ritiId) public view returns (UserEarning[] memory) {
 		Riti storage riti = ritis[_ritiId];
-		uint256[] memory ranks = new uint256[](riti.userInfo.length);
+		UserEarning[] memory earnings = new UserEarning[](riti.userInfo.length);
+
+		uint256 totalScore = 0;
 		for(uint256 i = 0; i < riti.userInfo.length; i++) {
-			ranks[i] = getRankForUserInRiti(_ritiId, riti.userInfo[i].userAddress);
+			totalScore += getScoreForUserInRiti(_ritiId, riti.userInfo[i].userAddress);
 		}
-		return ranks;
+
+		for(uint256 i = 0; i < riti.userInfo.length; i++) {
+			earnings[i] = UserEarning(
+				riti.userInfo[i].userAddress, 
+				getUsersEarningForRiti(_ritiId, totalScore, riti.userInfo[i].userAddress)
+			);
+		}
+
+		return earnings;
 	}
 
-	function getRankForUserInRiti(uint256 _ritiId, address _userAddress) public view returns (uint256) {
+	function getUsersEarningForRiti(uint256 _ritiId, uint256 totalScore, address userAddress) public view returns (uint256) {
+		Riti storage riti = ritis[_ritiId];
+		uint256 totalAmount = riti.config.stakeAmount * riti.userInfo.length;
+
+		return totalAmount * getScoreForUserInRiti(_ritiId, userAddress) / totalScore;
+	}
+
+	function getScoresForRiti(uint256 _ritiId) public view returns (UserScore[] memory) {
+		Riti storage riti = ritis[_ritiId];
+		UserScore[] memory scores = new UserScore[](riti.userInfo.length);
+		for(uint256 i = 0; i < riti.userInfo.length; i++) {
+			scores[i] = UserScore(riti.userInfo[i].userAddress, getScoreForUserInRiti(_ritiId, riti.userInfo[i].userAddress));
+		}
+		return scores;
+	}
+
+	function getScoreForUserInRiti(uint256 _ritiId, address _userAddress) public view returns (uint256) {
 		Riti storage riti = ritis[_ritiId];
 		uint256 rank = 0;
 		for(uint256 i = 0; i < riti.state.ritiCompletions.length; i++) {
 			for(uint256 j = 0; j < riti.state.ritiCompletions[i].completionStatus.length; j++) {
-				if(riti.state.ritiCompletions[i].completionStatus[j].userAddress == _userAddress) {
+				if(
+					riti.state.ritiCompletions[i].completionStatus[j].isComplete && 
+					riti.state.ritiCompletions[i].completionStatus[j].userAddress == _userAddress) {
 					rank++;
 					break;
 				}
 			}
 		}
+		
 		return rank;
 	}
 }
