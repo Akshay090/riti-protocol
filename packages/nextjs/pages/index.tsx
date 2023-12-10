@@ -36,7 +36,6 @@ const ScoreCard = ({
   const rankByAddress = sortedbyScore.findIndex(score => {
     return score.userAddress === address;
   });
-  console.log("rankByAddress", rankByAddress, " sortedbyScore", sortedbyScore, name);
 
   return (
     <div

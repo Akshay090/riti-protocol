@@ -28,61 +28,45 @@ const Home: NextPage = () => {
     functionName: "getAllRitis",
   });
 
-  // const signer = useEthersSigner();
+  const {
+    query: { slug },
+  } = useRouter();
 
-  // console.log(signer);
+  const getCurrentRitiData = getUserRitisResp.data?.find(riti => {
+    return riti.id === BigInt(Number(slug));
+  });
 
-  // useEffect(() => {
-  //   // if (!signer) return;
-  //   // async function connect() {
-  //   //   // const user = await PushAPI.initialize(signer, { env: CONSTANTS.ENV.STAGING });
-
-  //   //   // // channel creation
-  //   //   // // const response = await user.channel.create({
-  //   //   // //   name: "Riti Protocol Beta 1 Channel",
-  //   //   // //   description: "Test Description",
-  //   //   // //   icon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAz0lEQVR4AcXBsU0EQQyG0e+saWJ7oACiKYDMEZVs6GgSpC2BIhzRwAS0sgk9HKn3gpFOAv3v3V4/3+4U4Z1q5KTy42Ql940qvFONnFSGmCFmiN2+fj7uCBlihpgh1ngwcvKfwjuVIWaIGWKNB+GdauSk8uNkJfeNKryzYogZYoZY40m5b/wlQ8wQM8TayMlKeKcaOVkJ71QjJyuGmCFmiDUe+HFy4VyEd57hx0mV+0ZliBlihlgL71w4FyMnVXhnZeSkiu93qheuDDFDzBD7BcCyMAOfy204AAAAAElFTkSuQmCC",
-  //   //   // //   url: "https://push.org",
-  //   //   // // });
-
-  //   //   // // send notif to channel
-  //   //   // console.log("user", await user.channel.info());
-  //   // }
-  //   // connect();
-  // }, [signer]);
+  const ritiDatesForMonth = getCurrentRitiData?.state.ritiCompletions.slice(0, 30).map(ritiCompletion => {
+    return ritiCompletion.completionStatus;
+  });
+  console.log(ritiDatesForMonth, "ritiDatesForMonth ");
+  const calendarValues = ritiDatesForMonth?.map((ritiDate, idx) => {
+    return {
+      date: `2023-12-${idx}`,
+      count: 1,
+    };
+  });
+  console.log(calendarValues, "calendarValues");
 
   return (
     <>
       <MetaHeader />
       <div className="flex items-center flex-col flex-grow pt-10">
-        <div className="flex-grow w-full px-8">
-        <div className="max-w-xl p-2">
-        <CalendarHeatmap
-            startDate={new Date("2016-01-01")}
-            endDate={new Date("2016-04-01")}
-            values={[
-              { date: "2016-01-01", count: 12 },
-              { date: "2016-01-22", count: 122 },
-              { date: "2016-01-30", count: 38 },
-              // ...and so on
-            ]}
-          />
+        <div className="flex-grow w-full px-8 py-12">
+          <div className="flex justify-center items-start gap-12 flex-col sm:flex-row">
+            <div
+              style={{
+                width: "500px",
+              }}
+            >
+              <CalendarHeatmap
+                startDate={new Date("2023-10-01")}
+                endDate={new Date("2023-12-30")}
+                values={Array.from(calendarValues || [])}
+              />
+            </div>
+          </div>
         </div>
-          {/* <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
-            <h2 className="font-bold text-xl">Your Ritis</h2>
-            {getUserRitisResp.data?.map(riti => {
-              return (
-                // <ScoreCard
-                //   name={riti.config.platformConfig.platformName}
-                //   ritiId={riti.id}
-                //   progPercent={(riti.state.refreshCount / riti.config.maxRefreshCount) * BigInt(100)}
-                //   currentStreak={riti.state.refreshCount}
-                // />
-              );
-            })}
-          </div> */}
-        </div>
-
         {/* <div className="px-5">
           <h1 className="text-center mb-8">
             <span className="block text-2xl mb-2">Welcome to</span>
