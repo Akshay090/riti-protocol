@@ -12,6 +12,8 @@ import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline"
 import { MetaHeader } from "~~/components/MetaHeader";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
+const userNames = ['Akshay', 'Manthan', 'Riya', 'Deployer'];
+
 const Home: NextPage = () => {
   const { address } = useAccount();
 
@@ -32,6 +34,17 @@ const Home: NextPage = () => {
     query: { slug },
   } = useRouter();
 
+
+  const scoreResp = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getScoresForRiti",
+    args: [BigInt(Number(slug))],
+  });
+
+  const sortedbyScore = Array.from(scoreResp.data || []).sort((a, b) => {
+    return Number(b.score) - Number(a.score);
+  });
+
   const getCurrentRitiData = getUserRitisResp.data?.find(riti => {
     return riti.id === BigInt(Number(slug));
   });
@@ -39,14 +52,12 @@ const Home: NextPage = () => {
   const ritiDatesForMonth = getCurrentRitiData?.state.ritiCompletions.slice(0, 30).map(ritiCompletion => {
     return ritiCompletion.completionStatus;
   });
-  console.log(ritiDatesForMonth, "ritiDatesForMonth ");
   const calendarValues = ritiDatesForMonth?.map((ritiDate, idx) => {
     return {
       date: `2023-12-${idx}`,
       count: 1,
     };
   });
-  console.log(calendarValues, "calendarValues");
 
   return (
     <>
@@ -164,6 +175,53 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="table">
+            {/* head */}
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Rank</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* row 1 */}
+              {sortedbyScore?.map((score, idx) => {
+                return(<tr>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="avatar">
+                        <div className="mask mask-squircle w-12 h-12">
+                          <img
+                            src={`https://ui-avatars.com/api/?name=${userNames[idx]}&background=random&rounded=true&size=128`}
+                            alt="Avatar Tailwind CSS Component"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                       
+                        <div className="font-bold">{score.userAddress.toString()}</div>
+                        <div className="text-sm text-neutral">{userNames[idx]}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-center">
+                    {score.score.toString()}
+                  </td>
+                  <td className="text-center">{idx + 1}</td>
+                  {/* <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th> */}
+                </tr>)
+              })}
+              
+            </tbody>
+            
+          </table>
         </div>
       </div>
     </>

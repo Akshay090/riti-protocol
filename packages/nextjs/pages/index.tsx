@@ -3,12 +3,27 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PosterImage from "../components/assets/poster-image.png";
+import { CONSTANTS, PushAPI } from "@pushprotocol/restapi";
 import type { NextPage } from "next";
 import "wagmi";
 import { useAccount } from "wagmi";
 import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useEthersSigner } from "~~/hooks/useeEthersSigner";
+
+interface NotifT {
+  message: string;
+  title: string;
+}
+interface StreamT {
+  message: {
+    notification: {
+      body: string;
+      title: string;
+    };
+  };
+}
 
 const ScoreCard = ({
   name,
@@ -38,7 +53,6 @@ const ScoreCard = ({
     return score.userAddress === address;
   });
 
-  console.log(`/riti/${ritiId}`, 'bd debug');
   return (
     <Link href={`/riti/${ritiId}`}>
       <div
@@ -72,39 +86,101 @@ const Home: NextPage = () => {
     args: [address],
   });
 
-  console.log("getUserRitisResp", getUserRitisResp.data);
-
   const getAllRitisResp = useScaffoldContractRead({
     contractName: "RitiProtocol",
     functionName: "getAllRitis",
   });
 
-  // const signer = useEthersSigner();
+  const signer = useEthersSigner();
+  const [notifications, setNotifications] = React.useState<NotifT[]>([]);
 
-  // console.log(signer);
+  const [realTimeNotif, setRealTimeNotif] = React.useState<{ body: string; title: string }[]>([]);
 
-  // useEffect(() => {
-  //   // if (!signer) return;
-  //   // async function connect() {
-  //   //   // const user = await PushAPI.initialize(signer, { env: CONSTANTS.ENV.STAGING });
+  // const userAlice = await PushAPI.initialize(signer, { env: CONSTANTS.ENV.STAGING });
 
-  //   //   // // channel creation
-  //   //   // // const response = await user.channel.create({
-  //   //   // //   name: "Riti Protocol Beta 1 Channel",
-  //   //   // //   description: "Test Description",
-  //   //   // //   icon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAz0lEQVR4AcXBsU0EQQyG0e+saWJ7oACiKYDMEZVs6GgSpC2BIhzRwAS0sgk9HKn3gpFOAv3v3V4/3+4U4Z1q5KTy42Ql940qvFONnFSGmCFmiN2+fj7uCBlihpgh1ngwcvKfwjuVIWaIGWKNB+GdauSk8uNkJfeNKryzYogZYoZY40m5b/wlQ8wQM8TayMlKeKcaOVkJ71QjJyuGmCFmiDUe+HFy4VyEd57hx0mV+0ZliBlihlgL71w4FyMnVXhnZeSkiu93qheuDDFDzBD7BcCyMAOfy204AAAAAElFTkSuQmCC",
-  //   //   // //   url: "https://push.org",
-  //   //   // // });
+  useEffect(() => {
+    if (realTimeNotif.length > 0) {
+      setTimeout(() => {
+        setRealTimeNotif(prev => prev.slice(1));
+      }, 5000);
+    }
+  }, [realTimeNotif]);
 
-  //   //   // // send notif to channel
-  //   //   // console.log("user", await user.channel.info());
-  //   // }
-  //   // connect();
-  // }, [signer]);
+  useEffect(() => {
+    if (!signer) return;
+    async function connect() {
+      const user = await PushAPI.initialize(signer, { env: CONSTANTS.ENV.STAGING });
+
+      // // channel creation
+      const response = await user.notification.list("INBOX");
+      console.log("notif ", response);
+      setNotifications(response);
+
+      // await user.notification.subscribe(`eip155:11155111:0xdb184BC69B61b279c541189b5D698b31618dF1De`);
+
+      const stream = await user.initStream([CONSTANTS.STREAM.NOTIF], {
+        filter: {
+          channels: ["*"], // pass in specific channels to only listen to those
+          chats: ["*"], // pass in specific chat ids to only listen to those
+        },
+        connection: {
+          retries: 3, // number of retries in case of error
+        },
+        raw: false, // enable true to show all data
+      });
+
+      // Listen for notifications events
+      stream.on(CONSTANTS.STREAM.NOTIF, (data: StreamT) => {
+        console.log(data, "-- stream data --", data);
+        setRealTimeNotif(prev => [...prev, data.message.notification]);
+      });
+
+      // Connect stream, Important to setup up listen events first
+      stream.connect();
+
+      // send notif to channel
+      console.log("user", await user.channel.info());
+    }
+    connect();
+  }, [signer]);
 
   return (
     <>
       <MetaHeader />
+      <div
+        style={{
+          position: "absolute",
+          right: "0",
+          left: "0",
+          maxWidth: "460px",
+          bottom: "0px",
+        }}
+      >
+        {realTimeNotif.map(notif => {
+          return (
+            <div role="alert" className="alert shadow-lg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="stroke-info shrink-0 w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <div>
+                <h3 className="font-bold">{notif.title}</h3>
+                <div className="text-xs">{notif.body}</div>
+              </div>
+              {/* <button className="btn btn-sm">See</button> */}
+            </div>
+          );
+        })}
+      </div>
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="flex-grow w-full px-8">
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
@@ -187,37 +263,30 @@ const Home: NextPage = () => {
                 </div> */}
               </div>
             </div>
-            <div className="flex flex-col bg-base-100 p-4 text-center items-start max-w-xl rounded-md">
-              <h2 className="font-bold text-xl">Your Events</h2>
+            <div
+              style={{
+                height: "390px",
+                overflowY: "scroll",
+              }}
+              className="flex flex-col bg-base-100 p-4 text-center items-start max-w-xl rounded-md"
+            >
+              <h2 className="font-bold text-xl">Your Updates</h2>
 
-              <div className="mt-4">
-                <div className="flex justify-between">
-                  <p className="font-semibold my-1">The Cinnamon Challenge by Groove</p>
-                  <div className="flex items-center">
-                    <CalendarIcon className="h-6 w-6 fill-secondary" />
-                    <div className="ml-3 mr-3">10 Dec</div>
-                    | <BellIcon className="ml-2 h-6 w-6 fill-secondary" />
+              {notifications.map(notif => {
+                return (
+                  <div className="mt-4 w-full">
+                    <div className="flex justify-between">
+                      <p className="font-semibold my-1">{notif.title}</p>
+                      <div className="flex items-center">
+                        {/* <CalendarIcon className="h-6 w-6 fill-secondary" /> */}
+                        {/* <div className="ml-3 mr-3">10 Dec</div> */}
+                        <BellIcon className="ml-2 h-6 w-6 fill-secondary" />
+                      </div>
+                    </div>
+                    <p className="font-light my-1 text-start">{notif.message} </p>
                   </div>
-                </div>
-                <p className="font-light my-1 text-start">
-                  Full | Mid-tempo funk groove with flute, trombone & crazy horn breaks
-                </p>
-              </div>
-
-              {/* card repeat */}
-              <div className="mt-4">
-                <div className="flex justify-between">
-                  <p className="font-semibold my-1">The Cinnamon Challenge by Groove</p>
-                  <div className="flex items-center">
-                    <CalendarIcon className="h-6 w-6 fill-secondary" />
-                    <div className="ml-3 mr-3">10 Dec</div>
-                    | <BellIcon className="ml-2 h-6 w-6 fill-secondary" />
-                  </div>
-                </div>
-                <p className="font-light my-1 text-start">
-                  Full | Mid-tempo funk groove with flute, trombone & crazy horn breaks
-                </p>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
