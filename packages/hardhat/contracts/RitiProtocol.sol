@@ -286,7 +286,7 @@ contract RitiProtocol {
 			// add profit loss information in message.
 			if( profitOrLoss >= 0) {
 				 message = string(abi.encodePacked(
-					"Congratulations! You have earned extra", 
+					"Congratulations! You have earned extra ", 
 					Strings.toString(profitOrLoss), 
 					" wei! Your final score was ",
 					Strings.toString(getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress))

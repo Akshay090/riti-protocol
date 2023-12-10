@@ -38,6 +38,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
           env: CONSTANTS.ENV.STAGING 
      });
 
+  
     //  await deployerPushApi.channel.create({
     //   name: "RitiProtocol Channel | Eth india",
     //   description: "Eth India, team EtherYogis.",
@@ -53,11 +54,11 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         {
           "lastUpdated": 1,
           "startTime": 1,
-          "maxRefreshCount": 2,
+          "maxRefreshCount": 10,
           "stakeAmount": 1000000000,
           "frequency": 0,
           "platformConfig": {
-            "platformName": "Leetcodes"
+            "platformName": "Leetcode"
           }
         },
         {
@@ -69,7 +70,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
       {
         "lastUpdated": 1,
         "startTime": 1,
-        "maxRefreshCount": 2,
+        "maxRefreshCount": 10,
         "stakeAmount": 1000000000,
         "frequency": 0,
         "platformConfig": {
@@ -85,7 +86,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         {
           "lastUpdated": 1,
           "startTime": 1,
-          "maxRefreshCount": 2,
+          "maxRefreshCount": 10,
           "stakeAmount": 1000000000,
           "frequency": 0,
           "platformConfig": {
@@ -98,7 +99,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
     );
 
     // sleep for 20s
-     await new Promise(r => setTimeout(r, 50000));    
+     await new Promise(r => setTimeout(r, 10000));    
 
     const accounts = await hre.getNamedAccounts();
     console.log(accounts);
@@ -143,7 +144,7 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         }
       }
 
-      await new Promise(r => setTimeout(r, 20000));
+      await new Promise(r => setTimeout(r, 10000));
   
       // call refresh on riti for maxRefreshCount times, do it for all ritis, have timeout of 3s between each refresh.
       // call all of them togeather, not sepeartely

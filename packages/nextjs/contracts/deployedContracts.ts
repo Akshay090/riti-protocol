@@ -1378,7 +1378,7 @@ const deployedContracts = {
   },
   11155111: {
     RitiProtocol: {
-      address: "0x91600Bf0509FDcfDF6fA3FE1F99639219Fb974D1",
+      address: "0x6B8a4D196182caCb80a3e065cA0e1EF6bEEED41C",
       abi: [
         {
           inputs: [

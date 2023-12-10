@@ -12,7 +12,7 @@ import { BellIcon, BugAntIcon, CalendarIcon } from "@heroicons/react/24/outline"
 import { MetaHeader } from "~~/components/MetaHeader";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
-const userNames = ['Akshay', 'Manthan', 'Riya', 'Deployer'];
+const userNames = ["Akshay", "Manthan", "Riya", "Deployer"];
 
 const Home: NextPage = () => {
   const { address } = useAccount();
@@ -25,14 +25,26 @@ const Home: NextPage = () => {
 
   console.log("getUserRitisResp", getUserRitisResp.data);
 
-  const getAllRitisResp = useScaffoldContractRead({
-    contractName: "RitiProtocol",
-    functionName: "getAllRitis",
-  });
 
   const {
     query: { slug },
   } = useRouter();
+
+  const currentRiti = getUserRitisResp.data?.find(riti => {
+    return riti.id === BigInt(Number(slug));
+  });
+
+  let progress;
+  if (currentRiti?.state.refreshCount && currentRiti?.config.maxRefreshCount && currentRiti?.config.maxRefreshCount > 0) {
+    progress = currentRiti?.state.refreshCount / currentRiti?.config.maxRefreshCount;
+  }
+
+  const earningType = Number(progress) === 1 ? "Final" : "Expected";
+
+  const getAllRitisResp = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getAllRitis",
+  });
 
 
   const scoreResp = useScaffoldContractRead({
@@ -40,6 +52,21 @@ const Home: NextPage = () => {
     functionName: "getScoresForRiti",
     args: [BigInt(Number(slug))],
   });
+
+  const userEarnings = useScaffoldContractRead({
+    contractName: "RitiProtocol",
+    functionName: "getEarningsForAllUsersInRiti",
+    args: [BigInt(Number(slug))],
+  });
+
+  console.log(userEarnings.data, "userEarnings.data");
+
+  const findEarningByAddress = (address: string) => {
+    const obj = userEarnings.data?.find(earning => {
+      return earning.userAddress === address;
+    });
+    return Number(obj?.earning || 0);
+  };
 
   const sortedbyScore = Array.from(scoreResp.data || []).sort((a, b) => {
     return Number(b.score) - Number(a.score);
@@ -65,6 +92,54 @@ const Home: NextPage = () => {
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="flex-grow w-full px-8 py-12">
           <div className="flex justify-center items-start gap-12 flex-col sm:flex-row">
+            <div className="overflow-x-auto">
+              <table className="table">
+                {/* head */}
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Score</th>
+                    <th>Rank</th>
+                    <th>Earning - {earningType}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* row 1 */}
+                  {sortedbyScore?.map((score, idx) => {
+                    return (
+                      <tr>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="avatar">
+                              <div className="mask mask-squircle w-12 h-12">
+                                <img
+                                  src={`https://ui-avatars.com/api/?name=${userNames[idx]}&background=random&rounded=true&size=128`}
+                                  alt="Avatar Tailwind CSS Component"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="font-bold">{score.userAddress.toString()}</div>
+                              <div className="text-sm text-neutral">{userNames[idx]}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="text-center">{score.score.toString()}</td>
+                        <td className="text-center">{idx + 1}</td>
+
+                        <td className="text-center">{findEarningByAddress(score.userAddress)} WEI</td>
+
+                        {/* <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th> */}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
             <div
               style={{
                 width: "500px",
@@ -143,7 +218,7 @@ const Home: NextPage = () => {
               </div>
             </div>
             <div className="flex flex-col bg-base-100 p-4 text-center items-start max-w-xl rounded-md">
-              <h2 className="font-bold text-xl">Your Events</h2>
+              <h2 className="font-bold text-xl">Community</h2>
 
               <div className="mt-4">
                 <div className="flex justify-between">
@@ -175,53 +250,6 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="table">
-            {/* head */}
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Score</th>
-                <th>Rank</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* row 1 */}
-              {sortedbyScore?.map((score, idx) => {
-                return(<tr>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src={`https://ui-avatars.com/api/?name=${userNames[idx]}&background=random&rounded=true&size=128`}
-                            alt="Avatar Tailwind CSS Component"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                       
-                        <div className="font-bold">{score.userAddress.toString()}</div>
-                        <div className="text-sm text-neutral">{userNames[idx]}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    {score.score.toString()}
-                  </td>
-                  <td className="text-center">{idx + 1}</td>
-                  {/* <th>
-                    <button className="btn btn-ghost btn-xs">details</button>
-                  </th> */}
-                </tr>)
-              })}
-              
-            </tbody>
-            
-          </table>
         </div>
       </div>
     </>

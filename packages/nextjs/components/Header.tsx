@@ -17,11 +17,11 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Home",
     href: "/",
   },
-  {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
-  },
+  // {
+  //   label: "Debug Contracts",
+  //   href: "/debug",
+  //   icon: <BugAntIcon className="h-4 w-4" />,
+  // },
 ];
 
 export const HeaderMenuLinks = () => {
@@ -87,11 +87,11 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
+          <div className="flex relative w-12 h-12">
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/riti-logo.png" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold leading-tight">RITI </span>
+            <span className="font-bold leading-tight">RITI Protocol</span>
             <span className="text-xs">ETH India 2023</span>
           </div>
         </Link>
