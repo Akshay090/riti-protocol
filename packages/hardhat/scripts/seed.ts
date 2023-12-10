@@ -59,6 +59,9 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
           "platformConfig": {
             "platformName": "Leetcodes"
           }
+        },
+        {
+          gasLimit: 1000000
         }
     );
   
@@ -72,6 +75,9 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
         "platformConfig": {
           "platformName": "Cultfit"
         }
+      },
+      {
+        gasLimit: 1640000
       }
     );
   
@@ -85,11 +91,14 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
           "platformConfig": {
             "platformName": "Cycling",
           }
+        },
+        {
+          gasLimit: 1640000
         }
     );
 
     // sleep for 20s
-     await new Promise(r => setTimeout(r, 20000));    
+     await new Promise(r => setTimeout(r, 50000));    
 
     const accounts = await hre.getNamedAccounts();
     console.log(accounts);
@@ -173,6 +182,8 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
           }
           isUpdated= true;
           const ritiUsers = riti.userInfo;
+
+          console.log(ritiUsers);
         
           let refreshRitiData: RitiProtocol.UserRitiInformationStruct[] = [];
 
@@ -199,7 +210,11 @@ const seedData = async function (hre: HardhatRuntimeEnvironment) {
                 dataCollectionTimestamp: time,
                 completionStatus: refreshRitiData
               }
-            });
+            },
+            {
+              gasLimit: 1640000
+            }
+            );
           }
          
       if(!isUpdated){

@@ -1,5 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 
 // Useful for debugging. Remove when deploying to a live network.
 // import "hardhat/console.sol";
@@ -233,11 +235,13 @@ contract RitiProtocol {
 		riti.state.refreshCount++;
 
 		for(uint256 i = 0; i < request.data.completionStatus.length; i++) {
-			
+			if(riti.state.refreshCount == riti.config.maxRefreshCount) {
+				continue;
+			}
+
 			string memory message = "Congrats on completing the riti yesterday, keep up the good work!";
 			if(!request.data.completionStatus[i].isComplete) {
 				message = "You missed the riti yesterday, no worries, try to complete it today!";
-				continue;
 			}
 
 			IPUSHCommInterface(EPNS_COMM_ADDRESS).sendNotification(
@@ -265,32 +269,27 @@ contract RitiProtocol {
 			return;
 		}
 
-		// transfer earnings
 		UserEarning[] memory earnings = getEarningsForAllUsersInRiti(riti.id);
-		for (uint256 i = 0; i < earnings.length; i++) {
-			payable(earnings[i].userAddress).transfer(earnings[i].earning);
-		}
 
-		// send notification to all users
+			//send notification to all users
 		for(uint256 i = 0; i < riti.userInfo.length; i++) {
-			// calculate profit or loss in earning and for message.
-			// it can be calculated by comparing earning and stake amount.
-			uint256 profitOrLoss = earnings[i].earning - riti.config.stakeAmount;
-
+			// // calculate profit or loss in earning and for message.
+			// // it can be calculated by comparing earning and stake amount.
+			int256 profitOrLoss = int256(earnings[i].earning) - int256(riti.config.stakeAmount);
 		 	string memory message = string(abi.encodePacked(
 					"You have had a loss this time :( of", 
-					profitOrLoss, 
-					" wei! Your final score was",
-					getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress),
+					Strings.toString(profitOrLoss), 
+					" wei! Your final score was ",
+					Strings.toString(getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress)),
 					" Hope this was a learning experience for you! See you soon again."
 				));
 			// add profit loss information in message.
-			if(profitOrLoss >= 0) {
+			if( profitOrLoss >= 0) {
 				 message = string(abi.encodePacked(
 					"Congratulations! You have earned extra", 
-					profitOrLoss, 
-					" wei! Your final score was",
-					getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress)
+					Strings.toString(profitOrLoss), 
+					" wei! Your final score was ",
+					Strings.toString(getScoreForUserInRiti(riti.id, riti.userInfo[i].userAddress))
 					));
 			}
 
@@ -311,6 +310,11 @@ contract RitiProtocol {
 					)
 				)
 			);
+		}
+
+		// transfer earnings
+		for (uint256 i = 0; i < earnings.length; i++) {
+			payable(earnings[i].userAddress).transfer(earnings[i].earning);
 		}
 	}
 
@@ -403,3 +407,19 @@ contract RitiProtocol {
 		return rank;
 	}
 }
+
+/*
+
+{
+        "ritiId": 3,
+        "data": {
+            "dataCollectionTimestamp": 1633027200,
+            "completionStatus": [
+{
+            "userAddress": "0xdb184BC69B61b279c541189b5D698b31618dF1De",
+            "isComplete": true
+          }
+            ]
+        }
+    } ⁠
+	*/

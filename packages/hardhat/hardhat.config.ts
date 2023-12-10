@@ -64,6 +64,7 @@ const config: HardhatUserConfig = {
       accounts: [deployerPrivateKey],
     },
     sepolia: {
+      blockGasLimit: 1664910,
       url: `https://eth-sepolia.g.alchemy.com/v2/${providerApiKey}`,
       accounts: [
         deployerPrivateKey, 
