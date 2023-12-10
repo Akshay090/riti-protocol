@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import PosterImage from "../components/assets/poster-image.png";
 import type { NextPage } from "next";
 import "wagmi";
@@ -37,25 +38,28 @@ const ScoreCard = ({
     return score.userAddress === address;
   });
 
+  console.log(`/riti/${ritiId}`, 'bd debug');
   return (
-    <div
-      style={{
-        minWidth: "300px",
-      }}
-      className="flex flex-col bg-base-100 px-4 py-4 text-center items-start max-w-md rounded-2xl"
-    >
-      <div className="flex items-center justify-center">
-        <BugAntIcon className="h-8 w-8 fill-secondary" />
-        <p className="ml-2 font-semibold">{name}</p>
-      </div>
-      <div className="flex items-center justify-between w-full font-bold text-lg">
-        <div className="font-bold">{Number(progPercent)}%</div>
-        <div className="flex items-center justify-between">
-          <p>🔥{Number(currentStreak)}</p>
-          <p className="m-4">#{rankByAddress + 1}</p>
+    <Link href={`/riti/${ritiId}`}>
+      <div
+        style={{
+          minWidth: "300px",
+        }}
+        className="flex flex-col bg-base-100 px-4 py-4 text-center items-start max-w-md rounded-2xl"
+      >
+        <div className="flex items-center justify-center">
+          <BugAntIcon className="h-8 w-8 fill-secondary" />
+          <p className="ml-2 font-semibold">{name}</p>
+        </div>
+        <div className="flex items-center justify-between w-full font-bold text-lg">
+          <div className="font-bold">{Number(progPercent)}%</div>
+          <div className="flex items-center justify-between">
+            <p>🔥{Number(currentStreak)}</p>
+            <p className="m-4">#{rankByAddress + 1}</p>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -106,6 +110,7 @@ const Home: NextPage = () => {
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
             <h2 className="font-bold text-xl">Your Ritis</h2>
             {getUserRitisResp.data?.map(riti => {
+              if (riti.config.maxRefreshCount < 1) return;
               return (
                 <ScoreCard
                   name={riti.config.platformConfig.platformName}
